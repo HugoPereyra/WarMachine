@@ -1,0 +1,196 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Audio;
+
+
+namespace nave5pasos
+{
+    class Nave
+    {
+       
+        private Rectangle rectangulo;
+        private int altoImg = 44;
+        private int anchoImg = 42;
+        SoundEffect s_disparo;
+        
+        private Texture2D imagen;
+        public Texture2D Imagen
+        {
+            get { return imagen; }
+        }
+
+
+        private Rectangle bounds;
+        public Rectangle Bounds
+        {
+            get { return bounds; }
+        }
+
+        private Vector2 posicion;
+        public Vector2 Posicion
+        {
+            get { return posicion; }
+        }
+
+    
+
+     
+
+        private int altoVentana;
+        private int anchoVentana; 
+
+    
+        
+
+        private List<Disparo> disparos;
+        public List<Disparo> Disparos
+        {
+            get { return disparos; }
+        }
+
+        private int frameCounter = 0;
+        private ContentManager _content;
+
+        public Nave(int altoVentana,int anchoVentana)
+        {
+            this.altoVentana = altoVentana;
+            this.anchoVentana = anchoVentana;
+
+            posicion = new Vector2(altoVentana-altoImg * 2,(anchoVentana-anchoImg )/2);
+            CrearRectangulo(anchoImg, altoImg * 2);
+            disparos = new List<Disparo>();
+
+            
+        }
+
+        public void LoadContent(ContentManager Content)
+        {
+            this._content = Content;
+            imagen = Content.Load<Texture2D>("nave");
+            s_disparo = Content.Load<SoundEffect>("Laser_Shoot8");
+        
+        }
+
+        public void Update()
+
+        {
+            UpdateShots();
+            UpdatePosicion();
+            UpdateRectangulo();
+            bounds = new Rectangle((int)posicion.X, (int)posicion.Y, anchoImg, altoImg);
+        }
+
+        public void UpdateShots()
+        {
+            frameCounter++;
+            if (Keyboard.GetState().IsKeyDown(Keys.Space) && disparos.Count < 6 && frameCounter > 7)
+            {
+                s_disparo.Play(0.3f, 0.0f, 0.0f);
+                Disparo s = new Disparo(posicion, anchoImg, _content);
+                disparos.Add(s);
+                s.FueraDePantalla += new EventHandler(FueraDePantallaHandler);
+                frameCounter = 0;
+            }
+            disparos.ForEach(x => x.UpdateNave());
+        }
+
+        public void UpdatePosicion()
+        { 
+            if (Keyboard.GetState().IsKeyDown(Keys.Left) && posicion.X > 5)
+          
+                posicion.X -= 5;
+                  
+            if (Keyboard.GetState().IsKeyDown(Keys.Right) && posicion.X < (anchoVentana - anchoImg))
+
+                posicion.X += 5;
+            if (Keyboard.GetState().IsKeyDown(Keys.Up) && posicion.Y > 5)
+
+                posicion.Y -= 5;
+            if (Keyboard.GetState().IsKeyDown(Keys.Down) && posicion.Y < (altoVentana - altoImg))
+
+                posicion.Y += 5;
+
+        
+
+        }
+
+        
+
+        private void UpdateRectangulo()
+        {
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Left) && Keyboard.GetState().IsKeyDown(Keys.Up))
+            {
+                CrearRectangulo(0, altoImg);
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.Right) && Keyboard.GetState().IsKeyDown(Keys.Up))
+            {
+                CrearRectangulo(anchoImg * 2, altoImg);
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            {
+                CrearRectangulo(anchoImg, altoImg);
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.Left) && Keyboard.GetState().IsKeyDown(Keys.Down))
+            {
+                CrearRectangulo(0, 0);
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.Right) && Keyboard.GetState().IsKeyDown(Keys.Down))
+            {
+                CrearRectangulo(anchoImg * 2, 0);
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.Down))
+            {
+                CrearRectangulo(anchoImg, 0);
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            {
+                CrearRectangulo(0, altoImg * 2);
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            {
+                CrearRectangulo(anchoImg * 2, altoImg * 2);
+            }
+            else
+            {
+                CrearRectangulo(anchoImg, altoImg * 2);
+            }
+        }
+        
+        private void FueraDePantallaHandler(Object sender, EventArgs args)
+        {
+            disparos.Remove((Disparo)sender);
+        }
+
+        private void CrearRectangulo(int x, int y)
+        {
+            rectangulo = new Rectangle(x, y, anchoImg, altoImg);
+        }
+
+        public void Draw(SpriteBatch SpBch)
+        {
+            
+                SpBch.Draw(imagen,posicion,rectangulo,Color.White);
+            DrawShots(SpBch);
+        }
+
+        public void DrawShots(SpriteBatch SpBch)
+        {
+            foreach (Disparo s in disparos)
+            {
+
+                s.Draw(SpBch);
+
+            }
+        }
+
+
+    }
+}
