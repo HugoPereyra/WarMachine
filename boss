@@ -1,0 +1,145 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Audio;
+
+namespace nave5pasos
+{
+    class Boss
+    {
+        private Rectangle rectangulo;
+        private int altoImg = 60;
+        private int anchoImg = 60;
+        SoundEffect s_disparo;
+        private bool n;
+        public bool N
+        {
+            get { return n; }
+
+
+            set { n = value; }
+
+        }
+
+        private Texture2D imagen;
+        public Texture2D Imagen
+        {
+            get { return imagen; }
+        }
+
+
+        private Rectangle bounds;
+        public Rectangle Bounds
+        {
+            get { return bounds; }
+        }
+
+        private Vector2 posicion;
+        public Vector2 Posicion
+        {
+            get { return posicion; }
+
+            set { posicion = value; }
+        }
+
+
+
+
+
+        private int altoVentana;
+        private int anchoVentana;
+
+
+
+
+        private List<Disparo> disparos;
+        public List<Disparo> Disparos
+        {
+            get { return disparos; }
+        }
+
+        private int frameCounter = 0;
+        private ContentManager _content;
+        
+
+        public Boss(int altoVentana, int anchoVentana)
+        {
+            this.altoVentana = altoVentana;
+            this.anchoVentana = anchoVentana;
+
+            posicion = new Vector2(392, 45);
+
+            disparos = new List<Disparo>();
+
+            rectangulo = new Rectangle(0,0,60,60);
+
+
+        }
+
+        public void LoadContent(ContentManager Content)
+        {
+            this._content = Content;
+            imagen = Content.Load<Texture2D>("boss");
+            s_disparo = Content.Load<SoundEffect>("Laser_Shoot8");
+
+        }
+
+        public void Update(bool n)
+        {
+            UpdateShots(n);
+
+            bounds = new Rectangle((int)posicion.X, (int)posicion.Y, anchoImg, altoImg);
+            
+
+        }
+
+        public void UpdateShots(bool n)
+        {
+            frameCounter++;
+            if (n && disparos.Count < 1 && frameCounter > 7)
+            {
+                s_disparo.Play(0.3f, 0.0f, 0.0f);
+                Disparo s = new Disparo(posicion, anchoImg, _content);
+                disparos.Add(s);
+                s.FueraDePantalla += new EventHandler(FueraDePantallaHandler);
+                frameCounter = 0;
+            }
+            disparos.ForEach(x => x.UpdateBoss());
+        }
+
+
+
+
+
+
+        private void FueraDePantallaHandler(Object sender, EventArgs args)
+        {
+            disparos.Remove((Disparo)sender);
+        }
+
+
+
+        public void Draw(SpriteBatch SpBch)
+        {
+
+            SpBch.Draw(imagen, posicion, rectangulo, Color.White);
+            DrawShots(SpBch);
+        }
+
+        public void DrawShots(SpriteBatch SpBch)
+        {
+            foreach (Disparo s in disparos)
+            {
+
+                s.Draw(SpBch);
+
+            }
+        }
+    }
+}
