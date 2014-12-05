@@ -1,0 +1,66 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Input;
+
+namespace nave5pasos
+{
+    class Fondo
+    {
+        private const int anchoImg = 800;
+        private const int altoImg = 1700;
+        private int altoVentana;
+        private Texture2D imagen, imagen2, imagen3;
+        private Rectangle Rectangulo,tamaño;
+        
+        
+            
+             
+        public Fondo(int altoVentana, int anchoVentana)
+        {
+            Rectangulo = new Rectangle(0,altoImg - altoVentana,anchoVentana,altoVentana);
+            this.altoVentana = altoVentana;
+        
+        }
+
+        public void LoadContent(ContentManager content)
+        { 
+            imagen = content.Load<Texture2D>("fondo");
+            imagen2 = content.Load<Texture2D>("game over");
+            imagen3 = content.Load<Texture2D>("levelup");
+        }
+
+        public void Update()
+        {
+            Rectangulo.Y -= 1;
+            if (Rectangulo.Y <= 0)
+
+                Rectangulo.Y = ((altoImg - altoVentana) - 15);
+
+        }
+
+        public void Draw(SpriteBatch SpBch)
+        {
+            SpBch.Draw(imagen, new Vector2(0, 0), Rectangulo, Color.White);    
+        }
+
+
+        public void DrawFin(SpriteBatch SpBch)
+        {
+            tamaño = new Rectangle(0, 0, 800, 480);
+            SpBch.Draw(imagen2, new Vector2(0, 0),tamaño, Color.White);
+        }
+
+        public void Drawlvl(SpriteBatch SpBch)
+        {
+            tamaño = new Rectangle(0, 0, 800, 480);
+            SpBch.Draw(imagen3, new Vector2(0, 0), tamaño, Color.White);
+        }
+    
+    
+    }
+}
