@@ -1,0 +1,67 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+
+namespace nave5pasos
+{
+    public class animacion
+    {
+        private int framecount;
+        private Texture2D myTexture;
+        private float timePerFrame;
+        private int frame;
+        private float totalElapsed;
+  
+
+        public Vector2 position;
+
+        public animacion( int frameCount, int framesPerSec)
+        {
+          
+            framecount = frameCount;
+            timePerFrame = 1.0f / framesPerSec;
+            frame = 0;
+            totalElapsed = 0;
+
+        }
+
+        public void Load(ContentManager Content, string textName)
+        {
+            myTexture = Content.Load<Texture2D>(textName);
+
+        }
+
+        public void UpdateFrame(float elapsed)
+        {
+            totalElapsed += elapsed;
+            if (totalElapsed > timePerFrame)
+            {
+                frame++;
+                //Los frames son circulares, al llegar al último volvemos al primero.
+                frame = frame % framecount;
+                totalElapsed -= timePerFrame;
+            }
+        }
+
+        public void DrawFrame(SpriteBatch batch,Vector2 position)
+        {
+            DrawFrame(batch, frame,position);
+        }
+
+        public void DrawFrame(SpriteBatch batch, int frame,Vector2 position)
+        {
+            int FrameWidth = myTexture.Width / framecount;
+           
+            Rectangle sourcerect = new Rectangle(FrameWidth * frame, 0,
+            FrameWidth, myTexture.Height);
+
+            batch.Draw(myTexture, position, sourcerect, Color.White,
+            0, new Vector2(0, 0), 1, SpriteEffects.None, 1);
+        }
+
+    }
+}
